@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flexbox Navbar</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .nav-container {
+        background-color: darkslategray;
+        list-style: none;
+        display: flex;
+      }
+      .nav-item {
+        padding: 15px;
+        cursor: pointer;
+      }
+      .nav-item > a {
+        text-align: center;
+        text-decoration: none;
+        color: white;
+      }
+      .nav-item:hover {
+        background-color: deeppink;
+      }
+      main {
+        display: flex;
+      }
+      .main-left {
+        width: 70vw;
+        height: 700px;
+        border: 1px solid black;
+        margin: 10px;
+      }
+      #login-form > input[type="checkbox"] {
+        display: none;
+      }
+      #login-form > label {
+        color: #999999;
+      }
+      #login-form input[type="checkbox"] + label {
+        cursor: pointer;
+        padding-left: 26px;
+        background-image: url("checkbox.png");
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      #login-form input[type="checkbox"]:checked + label {
+        background-image: url("checkbox-active.png");
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      .login {
+        height: 350px;
+        padding: 40px;
+        box-sizing: border-box;
+      }
+      .login > h2 {
+        font-size: 24px;
+        color: #6a24fe;
+        margin-bottom: 20px;
+      }
+      #login-form > input {
+        width: 100%;
+        height: 48px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        margin-bottom: 16px;
+        border-radius: 6px;
+        background-color: #f8f8f8;
+      }
+      #login-form > input::placeholder {
+        color: #d2d2d2;
+      }
+      #login-form > input[type="submit"] {
+        color: #fff;
+        font-size: 16px;
+        background-color: #6a24fe;
+        margin-top: 20px;
+      }
+      .main-right1 {
+        height: 350px;
+        border: 1px solid black;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul class="nav-container">
+          <li class="nav-item"><a href="home.html">홈</a></li>
+          <li class="nav-item"><a href="item.html">상품</a></li>
+          <li class="nav-item"><a href="#">장바구니</a></li>
+          <li class="nav-item"><a href="#">마이페이지</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div class="main-left"></div>
+      <div class="main-right">
+        <div class="login">
+          <h2>Login</h2>
+          <form method="post" action="#" id="login-form">
+            <input type="text" name="userName" placeholder="Email" />
+            <input type="password" name="userPassward" placeholder="Password" />
+            <label for="remember-check">
+              <input type="checkbox" id="remeber-check" />아이디 저장하기
+            </label>
+            <input type="submit" value="Login" />
+          </form>
+        </div>
+        <div class="main-right1"></div>
+      </div>
+    </main>
+  </body>
+</html>
