@@ -1,0 +1,193 @@
+<?php
+session_start();
+if($_SESSION['username'] !='master'){
+    echo '<script>';
+        echo 'alert("잘못된 접근입니다.")';
+        echo '</script>';
+        echo '<script>window.location.href = "http://localhost/boardproject/"</script>';
+}
+include 'manage.php';
+header('Cache-Control: no cache');
+$fp = fopen("../fileset.txt", 'r');
+$fz = filesize("../fileset.txt");
+$fr = fread($fp, $fz);
+
+
+fclose($fp);
+$array = unserialize($fr);
+
+
+$fp1 = fopen("../boardset.txt", 'r');
+$fz2 = filesize("../boardset.txt");
+$fr = fread($fp1, $fz2);
+
+
+fclose($fp1);
+
+$result = [];
+
+// 쉼표를 기준으로 문자열을 분리
+$parts = explode(',', $fr);
+
+foreach ($parts as $part) {
+    // 각 부분을 등호를 기준으로 분리하여 키와 값을 추출
+    list($key, $value) = explode('=', $part);
+    
+    // 공백 제거
+    $key = trim($key);
+    $value = trim($value);
+    
+    // 배열에 저장
+    $result[$key] = $value;}
+
+
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            margin: 8px;
+        }
+        hr {
+            margin: 8px;
+        }
+        .pdr-1{
+            padding-right: 1vw;
+            height: 100%;
+        }
+        table, th, tr,td{
+            border: 1px solid black; border-collapse: collapse;
+            padding: 2px;
+        }
+        th, td{
+            text-align: center;
+        }
+        .main {
+            display: flex;
+            margin-top: 2vw;
+        }
+        .main_right {
+            margin-left: 3vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed; 
+            right: 50%; 
+            top: 180px; 
+            margin-right: -40vw;
+            text-align:center;
+            width: 200px;
+            border: 1px solid black;
+            border-radius: 1vw;
+        }
+        .fileset {
+            margin-top: 1vw;
+            margin-bottom: 1vw;
+        }
+        .pageform {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .page  {
+            margin-top: 0.5vw;
+            text-align: center;
+        }
+        .remote {
+            width: 80%;
+        }
+        #fileset_btn {
+            margin-top: 1vw;
+            margin-bottom: 0.5vw;
+        }
+        #btn {
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <?php include '../header.php'; ?>
+    <div class="main">
+    <table>
+        <tr>
+            <th>
+                아이디
+            </th>
+            <th>닉네임</th>
+            <th style="text-align: center;">회원별 게시글 수</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+        
+        <?php
+
+
+        foreach($row as $id){
+            if($id['useridx'] != 0){
+            $ids= $id['useridx'];
+            $name = $id['username'];
+            $uname = $id['uname'];
+
+            $sql = "select count(*) as cnt from board where useridx = :useridx";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':useridx', $ids);
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $stmt->execute();
+            $rs = $stmt->fetch();
+
+
+        
+        echo "<tr>";
+        echo "<td name='id' id='id'>".$name."</td>";
+        echo "<td>".$uname."</td>";
+        echo "<td style='text-align: center;'><a href='http://localhost/boardproject/?sdate=2024-06-20&ldate=2024-06-25&select=2&search=".$name."'>".$rs['cnt']."</a></td>";
+
+        echo "<td>";
+        echo "<button id='edit_btn' name='user_edit' onClick=location.href='management.html?ids=".$ids."'>수정</button>";
+        echo "</td>";
+        echo "<td>";
+        echo "<button id='delete_btn' name='user_delete' onClick=location.href='management_d.php?ids=".$ids."'>삭제</button>";
+        echo "</td>";
+        echo "</tr>";
+        }}
+        ?>
+        </table>
+        <div class="main_right">
+        <div class="pageset">
+            <form class="pageform" action="boardset.php" method="post">
+                <div><span>페이지당 게시글 수</span><input type="text" class="page" name="page_limit" placeholder="페이지당 게시글 수" value="<?php echo $result['page_limit'] ?>"></div>
+                <div><span>한번에 출력될 페이지 수</span><input type="text" class="page" name="limit" placeholder="한번에 출력될 페이지 수" value="<?php echo $result['limit'] ?>"></div>
+                <input type="submit" class="page" value="확인">
+            </form>
+        </div>
+        <hr class="remote">
+        <div class="fileset">
+            <table><form action="fileset.php" method="post">
+                <tr><th>확장자</th><th>사용여부</th></tr>
+                <tr><td style="text-align: center;">jpg</td><td style="text-align: center;"><input type="checkbox" name="jpg" <?php if(isset($array['jpg'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">gif</td><td style="text-align: center;"><input type="checkbox" name="gif" <?php if(isset($array['gif'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">hwp</td><td style="text-align: center;"><input type="checkbox" name="hwp" <?php if(isset($array['hwp'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">xls</td><td style="text-align: center;"><input type="checkbox" name="xls" <?php if(isset($array['xls'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">pdf</td><td style="text-align: center;"><input type="checkbox" name="pdf" <?php if(isset($array['pdf'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">zip</td><td style="text-align: center;"><input type="checkbox" name="zip" <?php if(isset($array['zip'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">png</td><td style="text-align: center;"><input type="checkbox" name="png" <?php if(isset($array['png'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">txt</td><td style="text-align: center;"><input type="checkbox" name="txt" <?php if(isset($array['txt'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">hwpx</td><td style="text-align: center;"><input type="checkbox" name="hwpx" <?php if(isset($array['hwpx'])){echo "checked";} ?>></td></tr>
+                <tr><td style="text-align: center;">xlsx</td><td style="text-align: center;"><input type="checkbox" name="xlsx" <?php if(isset($array['xlsx'])){echo "checked";} ?>></td></tr>
+                <tr id="btn"><td id="btn" colspan="2" style="text-align: center;"><input id="fileset_btn" type="submit" value="확인"></td></tr>
+            </form></table>
+        </div></div>
+    </div>
+
+</body>
+</html>

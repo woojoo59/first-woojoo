@@ -1,0 +1,267 @@
+<?php
+session_start();
+if(isset($_SESSION['useridx'])){
+        echo '<script>window.location.href = "http://localhost/boardproject/"</script>';
+}
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보수정</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            margin: 8px;
+        }
+        hr {
+            margin: 8px;
+        }
+        .pdr-1{
+            padding-right: 1vw;
+        }
+        .main {
+            margin-top: 3vw;
+            margin-left: 25vw;
+            border: 1px solid black;
+            border-radius: 1vw;
+            width: 50vw;
+        }
+        #user_id, #passwordcheck, #uname, #email_input {
+            width: 100%;
+            margin: 1vw;
+            height: 2vw;
+        }
+        #login_form {
+            width: 100%;
+        }
+        #iddiv, #pwdiv, #unamediv, #emaildiv {
+            display: flex;
+            margin-top: 1vw;
+            margin-left: 1vw;
+            margin-right: 1vw;
+            
+            align-items: center;
+        }
+
+        #logindiv {
+            display: flex;
+            flex-direction: column;
+            max-width: 50vw;
+        }
+        p{
+            min-width: 130px;
+            padding-right: 1vw;
+            text-align: right;
+        }
+        #passworddiv{
+            margin-top: 1vw;
+            margin-left: 1vw;
+            margin-right: 1vw;
+            
+            
+        }
+        .passworddiv1, .passworddiv2{
+            display: flex;
+            align-items: center;
+        }
+        #password1, #passwordck {
+            margin-top: 1vw;
+            margin-left: 1vw;
+            margin-right: 1vw;
+            height: 2vw;
+            width: 100%;
+        }
+        span {
+            padding-left: 2vw;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+        }
+        #duoname, #duoid {
+            width: 100px;
+            margin-right: 1vw;
+            height: 2vw;
+        }
+        #sign_btn {
+            width: 100px;
+            height: 30px;
+            text-align: center;
+        }
+        #sign_btn:hover {
+            background-color: #0CF5F5;
+        }
+        #btndiv{
+            margin: 2vw;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <?php include '../header.php'; ?>
+    <div class="main">
+        <h1>회원 가입</h1>
+        <hr>
+        <form id="signin_form" method="post" autocomplete="off"><div id="logindiv">
+            <div id="iddiv"><p>아이디 : </p><input type="text" id="user_id" name="user_id" placeholder="아이디" pattern="[A-Za-z0-9]+" title="영어와 숫자만 가능합니다." maxlength="45" minlength="4">
+            <button id="duoid">중복체크</button></div>
+            <span id="idspan"></span>
+            <div id="passworddiv">
+                <div class="passworddiv1"><p>비밀번호 : </p><input type="password" id="password1" name="password" placeholder="비밀번호(영문,숫자,!,@만 가능 특수문자 최소1개 필수 8~12까지 입력가능)"></div>
+                <div class="passworddiv2"><p>비밀번호 확인 : </p><input type="password" id="passwordck" name="passwordck" placeholder="비밀번호를 한번 더 입력해주세요."></div></div>
+                
+            
+            
+            
+            <div id="unamediv"><p>닉네임 : </p><input type="text" name="uname" id="uname" placeholder="닉네임" pattern="[A-Za-z0-9가-힣]+" title="한글, 영어, 숫자만 가능합니다." maxlength="45" minlength="2">
+            <button id="duoname">중복체크</button></div>
+            <span id="namespan"></span>
+            <div id="emaildiv"><p>이메일 : </p><input id="email_input" type="email" name="email" placeholder="abc@naver.com"></div>
+            
+            <div id="btndiv"><button id="sign_btn" type="submit">회원 가입</button></div></div>
+        </div></form>
+    </div>
+</body>
+<script>
+    const user_id = document.querySelector('#user_id')
+    const password = document.querySelector('#password1')
+    const uname = document.querySelector('#uname')
+    const signin_form = document.querySelector('#signin_form')
+    const sign_btn = document.querySelector('#sign_btn')
+    const duoid = document.querySelector('#duoid')
+    const duoname = document.querySelector('#duoname')
+    const passwordck = document.querySelector('#passwordck')
+    let nameok = 0
+    let idok = 0
+
+
+
+
+    duoid.addEventListener('click', ()=>{
+        event.preventDefault()
+
+        const idspan = document.querySelector('#idspan')
+
+        if(user_id.value.length >= 4){
+            const xhr = new XMLHttpRequest()
+            xhr.open("POST", './checkid.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            var params = 'id=' + encodeURIComponent(user_id.value);
+            xhr.send(params);
+
+            xhr.onload=()=>{
+                if(xhr.status == 200){
+                    const obj = JSON.parse(xhr.response)
+                    if(obj.result == 'exist'){
+                        alert("이미 사용중인 아이디입니다.")
+                        idspan.textContent = '사용불가능'
+                        user_id.value = ''
+                        idok = 0
+                    } else {
+                        alert("사용가능한 아이디입니다.")
+                        idspan.textContent = '사용가능'
+                        idok = 1
+                    }
+                }else {
+                    console.log(xhr.status)
+                }
+            }
+    }else{alert('최소 4글자 이상 입력해주세요.')}})
+
+    duoname.addEventListener('click', ()=>{
+        event.preventDefault()
+        const namespan = document.querySelector('#namespan')
+        
+        if(uname.value.length >=2 ){
+            const xhr = new XMLHttpRequest()
+            xhr.open("POST", './checkname.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            var params = 'id=' + encodeURIComponent(uname.value);
+            xhr.send(params);
+
+            xhr.onload=()=>{
+                if(xhr.status == 200){
+                    const obj = JSON.parse(xhr.response)
+                    if(obj.result == 'exist'){
+                        alert("이미 사용중인 닉네임입니다.") 
+                        namespan.textContent = '사용 불가능'
+                        duoname.value = ''
+                        nameok = 0
+                    } else {
+                        alert("사용가능한 닉네임입니다.")
+                        namespan.textContent = '사용 가능'
+                        nameok = 1
+                    }
+                }else {
+                    console.log(xhr.status)
+                }
+            }
+    }else {alert('최소 2글자 이상 입력해주세요.')
+        
+    }})
+
+    
+    sign_btn.addEventListener('click', ()=>{
+        event.preventDefault()
+
+        if(user_id.value == ''){
+            alert('ID를 입력해주세요.')
+            user_id.focus();
+            return false
+        }
+        if(password.value == ''){
+            alert('비밀번호를 입력해주세요.')
+            password.focus();
+            return false
+        }
+        if(password.value.length >=8 && password.value.length <= 12){
+            if(password.value.indexOf('!')!=-1 || password.value.indexOf('@')!=-1 ){
+                let value = password.value;
+                let pattern = /[^A-Za-z0-9!@]/;
+                if(pattern.test(value)){
+                    alert("!, @만 입력 가능합니다.")
+                    return false
+                }  
+            
+            }else {
+                alert("!, @의 특수문자를 최소 1개 입력해주세요.")
+                return false
+            }
+            
+        } else {
+            alert("8자리 이상 12자리 이하를 입력하세요.")
+            return false
+        }
+        if(idok == 0){
+            alert('id 중복확인 해주세요.')
+            return false
+        }
+        if (password.value != passwordck.value){
+            alert('비밀번호가 다릅니다')
+            passwordck.focus();
+            return false
+        }
+
+        if(nameok == 0){
+            alert('닉네임 중복확인 해주세요.')
+            return false
+        }
+
+        if(nameok ==1 && idok == 1) {
+                    
+            signin_form.action='signin.php'
+            signin_form.submit()
+                }
+    })
+
+</script>
+<script src="../index.js"></script>
+</html>

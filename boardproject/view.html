@@ -1,0 +1,442 @@
+<?php
+session_start();
+
+
+    include 'view.php';
+    include 'comments/comments.php';
+
+
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $row['subject']; ?></title>
+
+    <style>
+        
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            margin: 8px;
+        }
+        hr {
+            margin: 8px;
+        }
+        .pdr-1{
+            padding-right: 1vw;
+            height: 100%;
+        }
+
+        .main{            
+            width: 40vw;
+            
+            margin-left: 30vw;
+            margin-top: 3vw;}
+        .view_container{
+            min-height: 30vw;
+            border: solid 1px black;
+        }
+        .view_head{
+            height: 6vw;
+            border-bottom: solid 1px black;
+            text-align: center;
+            display: flex;
+        }
+        .view_subject{
+            width: 25vw;
+            line-height: 6vw;
+        }
+        .view_head_right{
+            width: 15vw;
+            border-left: solid 1px black;
+
+        }
+        .admin{
+            height: 2vw;
+            border-bottom: solid 1px black;
+            line-height: 2vw;
+        }
+        .hit{
+            height: 2vw;
+            border-bottom: solid 1px black;
+            line-height: 2vw;
+        }
+        .rdate{
+            height: 2vw;
+            line-height: 2vw;
+        }
+        .foot{
+            margin-left: 30vw;
+            display: flex;
+        }
+        .foot_right{
+            margin-left: 36.5vw;
+        }
+        .comments_write_container{
+            display: flex;
+            margin-top: 1vw;
+            margin-left: 30vw;
+            width: 40vw;
+            justify-content: space-between;
+        }
+        #comments_input{
+            width: 33vw;
+        }
+        #comment_table{
+            margin-left: 30vw;
+            width: 40vw;
+        }
+        #comments_write_form{
+            display: flex; 
+            justify-content: space-between;
+            width: 100%;
+        }
+        .comment_list{
+            height: 30px;
+        }
+
+        img{
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+
+        button {
+            min-width: 40px;
+        }
+        table {border-collapse: collapse; margin-top: 1vw; width: 40vw;}
+        tr { border: 1px solid #DCDCDC;}
+        th,td {padding-top: 3px; padding-bottom: 3px;}
+        .cotr{border: 1px solid transparent; border-bottom: 1px solid black;}
+        .tr3{
+            min-width: 92px;
+        }
+        .tr2{
+            min-width: 92px;
+        }
+        #lc, #rc{
+            display: flex;
+        }
+
+    </style>
+
+</head>
+<body>
+    <header>
+        <?php include 'header.php'; ?>
+    </header>
+    <div class="main">
+    <div class="view_container">
+        <div class="view_head">
+            <div class="view_subject" style="height: 6vw; overflow-x: auto; overflow-y: hidden;">
+                <?php echo $row['subject']; ?>
+            </div>
+            <div class="view_head_right">
+                <div class="admin">작성자 : <?php echo $creator; ?></div>
+                <div class="hit">조회수 : <?php echo $row['hit']; ?></div>
+                <div class="rdate">작성일 : <?php echo $row['rdate']; ?></div>
+            </div>
+            
+        </div>
+        <div class="view_contents">
+            <?php
+
+            if(isset($file[0])){
+                foreach($file as $filevalue){
+
+                    if($filevalue['filesize']!=''){
+                        
+                        
+                        $filename = $filevalue['filename'];
+                        $filesize = $filevalue['filesize'];
+
+
+
+                        $fname = explode('.',$filename);
+
+                        $encode = base64_url_encode($fname[0]);
+
+                        $final = $encode.'.'.$fname[1];
+                        
+                        
+
+
+
+
+                        $ex = explode('_',$filename);
+                        $fex = $ex[1];
+                        if($filesize>10000000){$size = $filesize/10000000;
+                            echo "<a href='uploads/{$final}' download='{$fex}'>$fex</a>         $size mb<br>";
+                        } else {$size = $filesize/10000;
+                        echo "<a href='uploads/{$final}' download='{$fex}'>$fex</a>         $size kb<br>";
+                        }
+                        
+                        
+                    $i++;}
+                }
+                echo "<hr>";
+            }
+            
+
+            if(isset($file[0])){
+            foreach($file as $rs){
+                $rsp = explode('.', $rs['filename']);
+                if(isset($rsp[1])){
+                if($rsp[1]=='jpg' or $rsp[1]=='jpeg' or $rsp[1]=='png'){
+                    
+
+                    $rsn = base64_url_encode($rsp[0]);
+                    $en1 = $rsn.'.'.$rsp[1];
+
+
+
+                    echo "<img src='uploads/".$en1."'>";
+                } 
+                }
+            }}
+            echo "<div>";
+            echo $row['content'];
+            echo "</div>"; ?>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+    <div>
+        <button onclick="window.location.href='http://localhost/boardproject/'">목록</button>
+    </div>
+
+
+        <?php if(isset($_SESSION['username'])){
+        if($row['useridx'] == $_SESSION['useridx']or $_SESSION['username']=='master')
+        {echo '
+        <div>
+            <button id="edit_btn">수정</button>
+            <button id="delete_btn">삭제</button>
+        </div>';}
+    }?>
+    </div></div>                                             
+    <!--  --------                                  댓글           ----------------                    -->
+    <?php if(isset($_SESSION['username'])){
+        $get = $_GET['view'];
+    echo '<div class="comments_write_container" >                                                        
+        <form method="post" id="comments_write_form" action="comments/comments_write.php">
+            <div id="lc">
+                <input type="text" name="com" id="comments_input">
+                <input type="hidden" name="idx" value="'.$get.'">
+            </div>
+            <div id="rc" style="width: 40px;"><button id="comments_btn">확인</button></div>
+        </form>
+    </div>';
+}?>
+
+    <?php 
+    echo '<table id="comment_table">';
+    function display_comments($comments, $comg = 0, $level = 0) {
+        global $conn;
+        foreach ($comments as $comment) {
+            if ($comment['comg'] == $comg) {
+
+                $sql = "select uname from usertbl where useridx = :useridx";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':useridx', $comment['useridx']);
+                $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                $stmt->execute();
+                $username = $stmt->fetch();
+                $user = $username["uname"];
+
+
+                $subidx = $comment['cidx'];
+
+                $subidx = $comment['cidx'];
+                echo '<tr class="comment_list" id="comment_list">';
+                
+                    if($user == '삭제된 계정'){
+                        echo '<td class="tr1"  style="min-width: 20vw; word-wrap: break-word;
+                        word-break: break-all;
+                        white-space: pre-line;" colspan="3">';
+        
+        
+                        echo str_repeat("↳", $level) . " " . $comment['content'];
+                        echo '</td>';
+
+
+                        $sql = 'select count(*) as cnt from comments where comg =:subidx';
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bindParam(':subidx', $subidx);
+                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                        $stmt->execute();
+                        $re = $stmt->fetch();
+                                            
+                                            
+                                            
+                        if($re['cnt']==0){
+                            echo '<td style="text-align: right;">';
+                                if(isset($_SESSION['useridx'])){
+                                if($_SESSION['useridx']==$comment['useridx'] or $_SESSION['username'] == 'master'){
+                                    echo'
+                                    <button style="margin-right: 5px;" id="c_delete" onClick=location.href="comments/c_delete.php?subidx='.$subidx.'">삭제</button></>
+                                    ';
+                                }}
+                                echo '</td><tr>';
+                        
+
+                        } 
+                        display_comments($comments, $comment['cidx'], $level + 1);
+                    } else {
+                        echo '<td class="tr1"  style="min-width: 20vw; word-wrap: break-word;
+                        word-break: break-all;
+                        white-space: pre-line;">';
+
+
+                        echo str_repeat("↳", $level) . " " . $comment['content'];
+                        echo '</td>
+                                <td class="tr3">'.$comment["rdate"].'</td>
+                                <td class="tr2">'.$user.'</td>';
+                        if(isset($_SESSION['useridx'])){
+                        echo '<td class="tr2"><button id="c_button" onclick="addInput('.$subidx.')">댓글</button>';}
+                        
+                        if(isset($_SESSION['useridx'])){
+                        if($_SESSION['useridx']==$comment['useridx'] or $_SESSION['username'] == 'master'){
+                            echo'
+                            <button style="margin-right: 5px;" id="c_delete" onClick=location.href="comments/c_delete.php?subidx='.$subidx.'">삭제</button></td>
+                            ';
+                        }}
+                        echo '</tr>';
+                        echo '<tr id="hidden'.$subidx.'" style="display: none;" class="cotr"><td id="input-container'.$subidx.'" colspan="3" style="height: 100%;"></td><td id="btns'.$subidx.'" style="height: 100%;"><div></div></td></tr>';
+
+
+                        display_comments($comments, $comment['cidx'], $level + 1);
+                    }
+                
+                
+            }
+        }
+    }
+    display_comments($result);
+    echo "</table>";
+    ?>
+
+    <?php if(isset($_SESSION['username'])) {
+        if($row['useridx'] == $_SESSION['useridx']or $_SESSION['username']=='master') {
+        echo "
+    <script>
+        const view = ".$_GET['view']."
+        const edit_btn = document.querySelector('#edit_btn')
+        edit_btn.addEventListener('click', () => {
+            self.location.href = 'write/edit.html?view='+view
+        })
+        const delete_btn = document.querySelector('#delete_btn')
+        delete_btn.addEventListener('click', () => {
+            self.location.href = 'write/delete.php?view='+view})
+    </script>";
+    }}?>
+    <?php 
+    if (!isset($_SESSION['username'])) {
+        echo '<script src="index.js"></script>';
+    }
+    
+    ?>
+    <script>
+        const comments_input = document.querySelector('#comments_input')
+        const comments_btn = document.querySelector('#comments_btn')
+        const comments_write_form = document.querySelector('#comments_write_form')
+        if(comments_btn != null){
+        comments_btn.addEventListener('click', ()=>{
+            event.preventDefault();
+            if(comments_input.value !=''){
+                comments_write_form.action='comments/comments_write.php'
+                comments_write_form.submit()
+            } else {
+                alert('댓글을 입력해주세요.')
+                comments_input.focus()
+            }
+            
+        })}
+
+        let coco = 0;
+        function addInput(subidx) {
+            if (coco == 0) {
+                const container = document.getElementById('input-container' + subidx);
+                const hidden = document.getElementById('hidden' + subidx);
+                const btns = document.getElementById('btns' + subidx);
+                
+                hidden.style.display = 'table-row';
+    
+                var newForm = document.createElement('form');
+                newForm.name = 'newForm';
+                newForm.method = 'post';
+                newForm.action = 'comments/coco_write.php';
+                newForm.id = 'newform';
+    
+                // 새로운 input 요소 생성
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'input';
+                input.id = 'cocoinput';
+                input.placeholder = '대댓글 입력';
+                input.style.marginRight = '4%';
+                input.style = "width: 90%"
+    
+                const inputhidden = document.createElement('input');
+                inputhidden.type = 'hidden';
+                inputhidden.name = 'subidx';
+                inputhidden.id = 'inputhidden';
+                inputhidden.value = subidx;
+    
+                const input_btn = document.createElement('input');
+                input_btn.type = 'submit';
+                input_btn.value = '확인';
+                input_btn.id = 'cococo';
+                input_btn.style = "width: 40px; margin-right: 5.63px;"
+    
+                const cod_btn = document.createElement('input');
+                cod_btn.type = 'button';
+                cod_btn.value = '취소';
+                cod_btn.id = 'cod';
+                cod_btn.style = "width: 40px;"
+    
+                // 요소들을 폼에 추가
+                newForm.appendChild(input);
+                newForm.appendChild(inputhidden);
+                btns.appendChild(input_btn);
+                btns.appendChild(cod_btn);
+                
+    
+                // 폼을 hidden에 추가
+                container.appendChild(newForm);
+    
+                // input 요소에 포커스 설정
+                input.focus();
+                coco++;
+                input_btn.addEventListener('click', ()=>{
+                    if(input.value != ''){
+                    newform.submit();}
+                    else {
+                        alert('대댓글을 입력해주세요.')
+                        input.focus();
+                    }
+                })
+    
+                // 취소 버튼 클릭 이벤트 추가
+                cod_btn.addEventListener('click', () => {
+                    const newform = document.getElementById('newform');
+                    newform.remove();
+                    removechildren(btns)
+                    coco = 0;
+                    hidden.style.display = 'none';
+                    function removechildren(parrent){
+
+                        parrent.innerHTML = "";
+                    }
+                });
+            }
+            
+        }
+    </script>
+
+    
+</body>
+</html>

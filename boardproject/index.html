@@ -1,0 +1,304 @@
+<?php
+
+session_start();
+include 'board.php';
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판</title>
+    
+    <link rel="stylesheet" href="jquery-ui-1.13.3.custom\jquery-ui.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+}
+table, th{width: 80vw; border: 1px solid black; border-collapse: collapse;}
+tr{border: 1px solid #949494; height: 2vw;}
+td{border: 1px dotted #ced4da;}
+
+#tr1{border-right: 1px solid #949494;}
+#tr2{padding-left: 0.5vw;}
+.tr1{width: 5vw;text-align: center;}
+.tr3, .tr4 {width: 10vw; text-align: center;}
+.tr2 {width: 40vw;}
+.container {
+    padding-left: 10vw;
+}
+footer {
+    padding-left: 10vw;
+    padding-top: 1vw;
+    display: flex;
+    width: 80vw;
+    justify-content: space-between;
+}
+.paging {
+    width: 15vw;
+}
+
+.status_login {
+    display: flex;
+}
+.pdr-1{
+    padding-right: 1vw;
+}
+.board:hover {
+    background-color : #ced4da;
+    cursor: pointer;
+}
+.view_container{
+    width: 40vw;
+    min-height: 30vw;
+    margin-left: 30vw;
+    margin-top: 3vw;
+
+}
+.view_head{
+    height: 6vw;
+
+    text-align: center;
+    display: flex;
+}
+h1{
+    vertical-align: middle;
+}
+.view_subject{
+    width: 25vw;
+    line-height: 6vw;
+}
+.view_head_right{
+    width: 15vw;
+
+
+}
+.admin{
+    height: 2vw;
+
+    line-height: 2vw;
+}
+.hit{
+    height: 2vw;
+
+    line-height: 2vw;
+}
+.rdate{
+    height: 2vw;
+    line-height: 2vw;
+}
+.foot{
+    margin-left: 30vw;
+    display: flex;
+}
+.foot_right{
+    margin-left: 33vw;
+}
+.comments_write{
+    display: flex;
+    margin-top: 1vw;
+    margin-left: 30vw;
+    
+}
+#comments_input{
+    width: 38vw;
+}
+#comment_table{
+    margin-left: 30vw;
+}
+#c_delete{
+    margin-left: 1vw;
+}
+img{
+    max-width: 100%;
+    max-height: 100%;
+}
+.status_login {
+display: flex;
+}
+.pdr-1{
+    padding-right: 1vw;
+}
+hr{
+    margin: 8px;
+}
+body {
+    margin: 8px;
+}
+button{min-width: 25px;}
+
+
+#footbtn{
+    margin-right: 0.5vw;
+}
+th{
+    background-color: #ced4da;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <?php include 'header.php'; ?>
+    </header>
+    <div>
+    <main class="container">
+        <h1>게시글 수 : <?php echo $total; ?></h1>
+        <table>
+            <tr>
+                <th class="tr1">idx</th>
+                <th class="tr2">제목</th>
+                
+                <th class="tr3">작성자</th>
+                <th class="tr4">등록일</th>
+                <th class="tr4">조회수</th>
+                <th class="tr1">댓글수</th>
+            </tr>
+
+            <?php
+            $index = $total-(($now_page-1)*$page_limit);
+            if($total == 0){
+                echo '<tr><td colspan="5" style="text-align: center;">게시글이 없습니다.</td></tr>';
+            }
+                foreach($row as $rs){
+                    $sql = "select uname from usertbl where useridx = :useridx";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':useridx', $rs['useridx']);
+                    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                    $stmt->execute();
+                    $username = $stmt->fetch();
+
+
+                    $sql = "select count(*) as cnt from comments where idx = :idx";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':idx', $rs['idx']);
+                    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                    $stmt->execute();
+                    $cnt = $stmt->fetch();
+
+
+
+                    echo '<tr class="board" id="board" onClick=location.href="view.html?view='.$rs["idx"].'">
+                        <td id="tr1" class="tr1">'.$index.'</td>
+                        <td id="tr2" class="tr2">'.$rs["subject"].'</td>
+                        
+                        <td class="tr3">'.$username["uname"].'</td>
+                        <td class="tr4">'.$rs["rdate"].'</td>
+                        <td class="tr4">'.$rs["hit"].'</td>
+                        <td style="text-align: center;">'.$cnt['cnt'].'</td>
+                    </tr>';
+                    $index--;
+                }
+            ?>
+        </table>
+    </main>
+    <footer>
+        <div style="display: flex;">
+        <div class="paging" style="width: 226px;">
+            <?php echo $rs_str; ?>
+            
+        </div>
+        <form method="get" id="date_form">
+            <div>
+            시작 <input type="text" name="sdate" id="datepicker" class="sdate">
+            끝   <input type="text" name="ldate" id="datepicker1" class="ldate">
+        </div>
+
+            <select name="select" id="select">
+                <option value="1">제목</option>
+                <option value="2">작성자</option>
+            </select>
+            <input class="tr2" id="search_input" type="text" id="search" name="search" pattern="[A-Za-z0-9가-힣]+" title="한, 영, 숫자만 입력 가능합니다.">
+            
+            <button id="search_btn" type="submit">검색</button>
+        </form>
+    </div>
+        <div style="display: flex;">
+        <?php
+            if(isset($_SESSION['username'])) {
+                $nameidx = $_SESSION['useridx'];
+                $sql = "select uname from usertbl where useridx = :useridx";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':useridx', $nameidx);
+                $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                $stmt->execute();
+                $username = $stmt->fetch();
+                $sename = $username['uname'];
+                echo '<form class="write" method="post" action="write/write.html">
+                    <button id="footbtn" type="submit" style="min-height: 100%;">글쓰기</button>
+                </form>';
+                
+                
+
+                if($_SESSION['username'] == 'master'){
+                    echo '<form method="post" action="manage/manage.html">
+                        <button id="footbtn" type="submit" style="height: 100%;">관리자</button>
+                    </form>';
+                }
+                echo '<button id="mybtn">내 글 보기</button>';
+                
+                
+            }
+        ?>
+    </div></div>    
+    </footer>
+    <?php if(!isset($_SESSION['username'])) {
+    echo '<script src="index.js"></script>';}
+    else {echo "<script>const a='".$sename."'</script>";}
+?>
+    <script src="search.js"></script>
+    <script>
+        const s = "<?php echo $sdate; ?>"
+        const l = "<?php echo $ldate; ?>"
+        
+        
+
+        const date_form = document.querySelector('#date_form')
+        const ldate = document.querySelector('.ldate')
+        ldate.value = new Date().toISOString().substring(0, 10);;
+        //ldate.max = new Date().toISOString().substring(0, 10);;
+        const sdate = document.querySelector('.sdate')
+        sdate.max = new Date().toISOString().substring(0, 10);;        
+        sdate.value = s
+        ldate.value = l
+        const date_btn = document.querySelector('#date_btn')
+        
+        const mybtn = document.querySelector('#mybtn')
+        const search_input = document.querySelector('#search_input')
+        const select = document.querySelector('#select')
+        if(mybtn != null){
+        mybtn.addEventListener('click', ()=>{
+            search_input.value=a
+            select.value=2
+            date_form.submit()
+        })}
+
+        $( function() {
+    $( "#datepicker" ).datepicker({
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        changeMonth: true,
+        changeYear: true,
+        dayNamesMin: [ "일", "월", "화", "수", "목", "금", "토" ],
+        monthNamesShort: [ "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월" ],
+        dateFormat: "yy-mm-dd",
+        showMonthAfterYear: true
+    });
+    $( "#datepicker1" ).datepicker({
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        changeMonth: true,
+        changeYear: true,
+        dayNamesMin: [ "일", "월", "화", "수", "목", "금", "토" ],
+        monthNamesShort: [ "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월" ],
+        dateFormat: "yy-mm-dd",
+        showMonthAfterYear: true
+    });
+} );
+    </script>
+</body>
+</html>

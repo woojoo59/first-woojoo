@@ -1,0 +1,191 @@
+<?php
+session_start();
+if(!isset($_SESSION['username'])){
+    
+    echo '<script>';
+    echo 'alert("잘못된 접근입니다.")';
+    echo '</script>';
+    echo '<script>window.location.href = "http://localhost/boardproject/"</script>';
+}
+include 'edit.php';
+$view = $_GET['view'];
+include '../view.php';
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수정페이지</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            margin: 8px;
+        }
+        hr {
+            margin: 8px;
+        }
+        .pdr-1{
+            padding-right: 1vw;
+        }
+        .view_container {
+            margin-left: 30vw;
+            margin-top: 3vw;
+            width: 40vw;
+            border: 1px solid black;
+        }
+        .view_head {
+            display: flex;
+            height: 6vw;
+        }
+        #write_subject {
+            width: 100%;
+            height: 100%;
+            border: 1px solid white;
+            border-bottom: solid 1px black;
+            text-align: center;
+        }
+        .view_contents {
+            border: 1px solid white;
+            border-top: 1px solid black;
+            min-height: 30vw;
+            outline: none;
+            white-space: normal;
+        }
+        .foot {
+            margin-left: 30vw;
+            width: 40vw;
+            display: flex;
+            flex-direction: row-reverse;
+            border-left: 2px solid white;
+        }
+        #userfile {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .view_contents:empty:before {
+            content: attr(placeholder);
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <?php include '../header.php' ?>
+    <div class="view_container">
+        <form enctype="multipart/form-data" method="post" id="write_form">
+            <div class="view_head">
+                <input type="text" name="write_subject" id="write_subject" value="<?php echo $row['subject'] ?>" maxlength="100">
+            </div>
+            <input type="file" name="file[]" id="userfile" multiple onchange="checkFileExtensions()">
+            <div>
+                <?php             
+            if(isset($file[0])){
+                echo "<a>업로드된 파일</a><br>
+                <a>삭제하려면 체크박스를 체크하시오.</a><br>";
+                $i=0;
+                foreach($file as $filevalue){
+                    if($filevalue['filesize'] !=''){
+                    $filename=$filevalue['filename'];
+                    $fsize = $filevalue['filesize'];
+                    echo "<a href='uploads/{$filename}' download='{$filename}'>$filename</a>         $fsize.byte<input type='checkbox' name='{$filename}' id='check'><br>";
+                    }
+                    $i++;
+                }
+            }?>
+            <input type="hidden" name="hidden" value="<?php echo $i; ?>">
+            </div>
+            
+            <div contenteditable="true" class="view_contents" id="content" aria-placeholder="content">
+
+                <?php echo $row['content'] ?> 
+            </div><input type="hidden" name="write_content" id="write_content">
+        </form>
+        
+    </div>
+
+    <div class="foot">
+
+        <button id="write_btn">작성</button>
+    </div>
+    <?php
+$fp = fopen("../fileset.txt", 'r');
+$fz = filesize("../fileset.txt");
+$fr = fread($fp, $fz);
+
+
+fclose($fp);
+$array = unserialize($fr);
+
+echo '<script>';
+
+echo 'let allowExtensions = [];';
+if(isset($array['jpg'])){echo 'allowExtensions.push("jpg");';}
+if(isset($array['gif'])){echo 'allowExtensions.push("gif");';}
+if(isset($array['hwp'])){echo 'allowExtensions.push("hwp");';}
+if(isset($array['xls'])){echo 'allowExtensions.push("xls");';}
+if(isset($array['pdf'])){echo 'allowExtensions.push("pdf");';}
+if(isset($array['zip'])){echo 'allowExtensions.push("zip");';}
+if(isset($array['png'])){echo 'allowExtensions.push("png");';}
+if(isset($array['txt'])){echo 'allowExtensions.push("txt");';}
+if(isset($array['hwpx'])){echo 'allowExtensions.push("hwpx");';}
+if(isset($array['xlsx'])){echo 'allowExtensions.push("xlsx");';}
+echo 'const view='.$view;
+echo '</script>'
+
+?>
+    <script>
+        const write_form = document.querySelector('#write_form')
+        const write_subject = document.querySelector('#write_subject')
+        const content = document.querySelector('#content')
+        const write_content = document.querySelector('#write_content')
+        const write_btn = document.querySelector('#write_btn')
+        const userfile = document.querySelector('#userfile')
+        function checkFileExtensions(){
+            const input = document.getElementById('userfile');
+            const files = input.files;
+
+            let valid = true;
+            let invalidFiles = [];
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileName = file.name;
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+
+                if(!allowExtensions.includes(fileExtension)){
+                    alert(fileExtension+'는(은) 업로드 불가능한 파일 확장자입니다.')
+                    userfile.value=''
+                }
+                if(file.size > 10000000) {
+                    alert('최대 10mb까지 업로드 가능합니다.')
+                    userfile.value=''
+                }
+            }
+            
+        }
+
+
+        write_btn.addEventListener('click', ()=>{
+
+            if(write_subject.value != '') {
+                write_content.value = content.innerHTML
+                write_form.action = 'edit_ok.php?view='+view
+                write_form.submit()
+            } else {
+                alert('제목을 입력해주세요.')
+                write_subject.focus()
+            }
+
+        })
+    </script>
+    <?php 
+    if (!isset($_SESSION['username'])) {
+        echo '<script src="index.js"></script>';
+    }
+    
+    ?>
+</body>
+</html>
