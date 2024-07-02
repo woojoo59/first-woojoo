@@ -6,10 +6,13 @@ include '../dbconfig.php';
 
 
 
+
 $user_id = (isset($_POST['user_id']) && $_POST['user_id'] != '') ? $_POST['user_id'] : '';
 $password = (isset($_POST['password']) && $_POST['password'] != '') ? $_POST['password'] : '';
 $uname = $_POST['uname'];
 $email = isset($_POST['email'])?$_POST['email']:'';
+
+$email .='@'.$_POST['emailback'];
 
 $pwd_hash = password_hash($password, PASSWORD_BCRYPT);
 

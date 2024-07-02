@@ -82,7 +82,7 @@ foreach ($parts as $part) {
             align-items: center;
             position: fixed; 
             right: 50%; 
-            top: 180px; 
+            top: 200px; 
             margin-right: -40vw;
             text-align:center;
             width: 200px;
@@ -92,6 +92,14 @@ foreach ($parts as $part) {
         .fileset {
             margin-top: 1vw;
             margin-bottom: 1vw;
+            display: flex;
+            align-items: center;
+        }
+        #updown {
+            margin-right: 1vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .pageform {
             display: flex;
@@ -112,12 +120,14 @@ foreach ($parts as $part) {
         #btn {
             border: 1px solid white;
         }
+
     </style>
 </head>
 <body>
     <?php include '../header.php'; ?>
+    <div class="top"></div>
     <div class="main">
-    <table>
+    <table id="test">
         <tr>
             <th>
                 아이디
@@ -161,8 +171,13 @@ foreach ($parts as $part) {
         echo "</tr>";
         }}
         ?>
+        
         </table>
-        <div class="main_right">
+        
+        
+    </div>
+    <div id="bottom"></div>
+    <div class="main_right">
         <div class="pageset">
             <form class="pageform" action="boardset.php" method="post">
                 <div><span>페이지당 게시글 수</span><input type="text" class="page" name="page_limit" placeholder="페이지당 게시글 수" value="<?php echo $result['page_limit'] ?>"></div>
@@ -172,7 +187,8 @@ foreach ($parts as $part) {
         </div>
         <hr class="remote">
         <div class="fileset">
-            <table><form action="fileset.php" method="post">
+            
+            <table id="fileset_tbl"><form action="fileset.php" method="post">
                 <tr><th>확장자</th><th>사용여부</th></tr>
                 <tr><td style="text-align: center;">jpg</td><td style="text-align: center;"><input type="checkbox" name="jpg" <?php if(isset($array['jpg'])){echo "checked";} ?>></td></tr>
                 <tr><td style="text-align: center;">gif</td><td style="text-align: center;"><input type="checkbox" name="gif" <?php if(isset($array['gif'])){echo "checked";} ?>></td></tr>
@@ -187,7 +203,5 @@ foreach ($parts as $part) {
                 <tr id="btn"><td id="btn" colspan="2" style="text-align: center;"><input id="fileset_btn" type="submit" value="확인"></td></tr>
             </form></table>
         </div></div>
-    </div>
-
 </body>
 </html>

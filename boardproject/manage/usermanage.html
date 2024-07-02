@@ -25,6 +25,11 @@ $useridx = $row['useridx'];
 $usernames = $row['username'];
 $uname = $row['uname'];
 $email = $row['email'];
+$email1 = explode('@',$email);
+
+$email = $email1[0];
+$emailback = $email1[1];
+
 
 
 ?>
@@ -55,8 +60,13 @@ $email = $row['email'];
             border-radius: 1vw;
             width: 50vw;
         }
-        #user_id, #passwordcheck, #uname, #email_input {
+        #user_id, #passwordcheck, #uname {
             width: 100%;
+            margin: 1vw;
+            height: 2vw;
+        }
+        #email_input, #emailback {
+            width: 40%;
             margin: 1vw;
             height: 2vw;
         }
@@ -146,7 +156,11 @@ $email = $row['email'];
             <div id="unamediv"><p>닉네임 : </p><input type="text" name="uname" id="uname" placeholder="닉네임" pattern="[A-Za-z0-9가-힣]+" title="한글, 영어, 숫자만 가능합니다." maxlength="45" minlength="2">
             <button id="duoname">중복체크</button></div>
             <span id="namespan"></span>
-            <div id="emaildiv"><p>이메일 : </p><input id="email_input" type="email" name="email" placeholder="abc@naver.com" value="<?php echo $email; ?>"></div>
+            <div id="emaildiv"><p>이메일 : </p><input id="email_input" type="text" name="email" placeholder="email" value="<?php echo $email; ?>">@<select name="emailback" id="emailback">
+                <option value="naver.com" <?php if($emailback == 'naver.com') {echo 'selected';} ?>>naver.com</option>
+                <option value="daum.net" <?php if($emailback == 'daum.net') {echo 'selected';} ?>>daum.net</option>
+                <option value="gmail.com" <?php if($emailback == 'gmail.com') {echo 'selected';} ?>>gmail.com</option>
+            </select></div>
             
             <div id="btndiv"><button id="sign_btn" type="submit">회원정보수정</button></div></div>
             <input type="hidden" name="useridx" value="<?php echo $useridx; ?>">
@@ -166,6 +180,7 @@ $email = $row['email'];
     const duoname = document.querySelector('#duoname')
     const passwordcheck = document.querySelector('#passwordcheck')
     const passwordck = document.querySelector('#passwordck')
+    const email_input = document.querySelector('#email_input')
 
     let nameok = 1
     let idok = 1
@@ -189,6 +204,13 @@ $email = $row['email'];
     duoname.addEventListener('click', ()=>{
         event.preventDefault()
         const namespan = document.querySelector('#namespan')
+        let namepattern = /[^A-Za-z0-9가-힣]/
+        if(namepattern.test(uname.value)){
+            alert('닉네임은 한글과 영어, 숫자만 입력가능합니다.')
+            namespan.textContent = '2~45글자, 한글과 영어, 숫자만 입력 가능합니다.'
+            nameok = 0
+            return false
+        }
         
         if(uname.value.length >=2 ){
             const xhr = new XMLHttpRequest()
@@ -230,6 +252,14 @@ $email = $row['email'];
     
     sign_btn.addEventListener('click', ()=>{
         event.preventDefault()
+        let pattern = /[^A-Za-z0-9]/
+
+        if(pattern.test(email_input.value)){
+            if(email_input.value !=''){
+            alert('이메일은 영어, 숫자만 입력가능합니다.')
+            email_input.focus()
+            return false}
+        }
         if(passwordcheck.value.length >= 8 && nameok == 1){
             const xhr = new XMLHttpRequest()
             xhr.open("POST", 'checkpw.php', true);
@@ -258,7 +288,7 @@ $email = $row['email'];
                 }  
             
             }else {
-                alert("!, @의 특수문자를 최소 1개 입력해주세요.")
+                alert("비밀번호에 !, @의 특수문자를 최소 1개 입력해주세요.")
                 return false
             }
             
@@ -296,6 +326,10 @@ $email = $row['email'];
         } else if(passwordcheck.value.length < 8) {
             alert("비밀번호를 확인해주세요.") 
             passwordcheck.focus();
+            return false
+        } else if(nameok == 0){
+            alert("닉네임 중복체크 해주세요.")
+            uname.focus()
             return false
         }
 

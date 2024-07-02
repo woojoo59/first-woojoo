@@ -16,6 +16,8 @@ $password = $_POST['password'];
 $useridx = $_POST['useridx'];
 $uname = $_POST['uname'];
 $email = $_POST['email'];
+$email .='@'.$_POST['emailback'];
+
 
 $sql = "select uname from usertbl where useridx = :useridx";
 $stmt = $conn->prepare($sql);

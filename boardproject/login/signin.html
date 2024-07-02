@@ -31,10 +31,15 @@ if(isset($_SESSION['useridx'])){
             border-radius: 1vw;
             width: 50vw;
         }
-        #user_id, #passwordcheck, #uname, #email_input {
+        #user_id, #passwordcheck, #uname {
             width: 100%;
             margin: 1vw;
             height: 2vw;
+        }
+        #email_input, #emailback {
+            margin: 1vw;
+            height: 2vw;
+            width: 40%;
         }
         #login_form {
             width: 100%;
@@ -109,20 +114,24 @@ if(isset($_SESSION['useridx'])){
         <h1>회원 가입</h1>
         <hr>
         <form id="signin_form" method="post" autocomplete="off"><div id="logindiv">
-            <div id="iddiv"><p>아이디 : </p><input type="text" id="user_id" name="user_id" placeholder="아이디" pattern="[A-Za-z0-9]+" title="영어와 숫자만 가능합니다." maxlength="45" minlength="4">
+            <div id="iddiv"><p>*아이디 : </p><input type="text" id="user_id" name="user_id" placeholder="아이디" pattern="[A-Za-z0-9]+" title="영어와 숫자만 가능합니다." maxlength="45" minlength="4">
             <button id="duoid">중복체크</button></div>
             <span id="idspan"></span>
             <div id="passworddiv">
-                <div class="passworddiv1"><p>비밀번호 : </p><input type="password" id="password1" name="password" placeholder="비밀번호(영문,숫자,!,@만 가능 특수문자 최소1개 필수 8~12까지 입력가능)"></div>
-                <div class="passworddiv2"><p>비밀번호 확인 : </p><input type="password" id="passwordck" name="passwordck" placeholder="비밀번호를 한번 더 입력해주세요."></div></div>
+                <div class="passworddiv1"><p>*비밀번호 : </p><input type="password" id="password1" name="password" placeholder="비밀번호(영문,숫자,!,@만 가능 특수문자 최소1개 필수 8~12까지 입력가능)"></div>
+                <div class="passworddiv2"><p>*비밀번호 확인 : </p><input type="password" id="passwordck" name="passwordck" placeholder="비밀번호를 한번 더 입력해주세요."></div></div>
                 
             
             
             
-            <div id="unamediv"><p>닉네임 : </p><input type="text" name="uname" id="uname" placeholder="닉네임" pattern="[A-Za-z0-9가-힣]+" title="한글, 영어, 숫자만 가능합니다." maxlength="45" minlength="2">
+            <div id="unamediv"><p>*닉네임 : </p><input type="text" name="uname" id="uname" placeholder="닉네임" pattern="[A-Za-z0-9가-힣]+&" title="한글, 영어, 숫자만 가능합니다." maxlength="45" minlength="2">
             <button id="duoname">중복체크</button></div>
             <span id="namespan"></span>
-            <div id="emaildiv"><p>이메일 : </p><input id="email_input" type="email" name="email" placeholder="abc@naver.com"></div>
+            <div id="emaildiv"><p>이메일 : </p><input id="email_input" type="text" name="email" pattern="[A-Za-z0-9]+&" placeholder="email">@<select name="emailback" id="emailback">
+                <option value="naver.com">naver.com</option>
+                <option value="daum.net">daum.net</option>
+                <option value="gmail.com">gmail.com</option>
+            </select></div>
             
             <div id="btndiv"><button id="sign_btn" type="submit">회원 가입</button></div></div>
         </div></form>
@@ -137,6 +146,7 @@ if(isset($_SESSION['useridx'])){
     const duoid = document.querySelector('#duoid')
     const duoname = document.querySelector('#duoname')
     const passwordck = document.querySelector('#passwordck')
+    const email_input =document.querySelector('#email_input')
     let nameok = 0
     let idok = 0
 
@@ -147,8 +157,16 @@ if(isset($_SESSION['useridx'])){
         event.preventDefault()
 
         const idspan = document.querySelector('#idspan')
-
+        
         if(user_id.value.length >= 4){
+            let idpattern = /[^A-Za-z0-9]/
+        if(idpattern.test(user_id.value)){
+            alert('영어와 숫자만 입력가능합니다.')
+            idspan.textContent = '4~45글자, 영어와 숫자만 입력 가능합니다.'
+            user_id.value = ''
+            idok = 0
+            return false
+        }
             const xhr = new XMLHttpRequest()
             xhr.open("POST", './checkid.php', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -178,7 +196,14 @@ if(isset($_SESSION['useridx'])){
     duoname.addEventListener('click', ()=>{
         event.preventDefault()
         const namespan = document.querySelector('#namespan')
-        
+        let namepattern = /[^A-Za-z0-9가-힣]/
+        if(namepattern.test(uname.value)){
+            alert('한글과 영어, 숫자만 입력가능합니다.')
+            namespan.textContent = '2~45글자, 한글과 영어, 숫자만 입력 가능합니다.'
+            uname.value = ''
+            nameok = 0
+            return false
+        }
         if(uname.value.length >=2 ){
             const xhr = new XMLHttpRequest()
             xhr.open("POST", './checkname.php', true);
@@ -193,7 +218,7 @@ if(isset($_SESSION['useridx'])){
                     if(obj.result == 'exist'){
                         alert("이미 사용중인 닉네임입니다.") 
                         namespan.textContent = '사용 불가능'
-                        duoname.value = ''
+                        uname.value = ''
                         nameok = 0
                     } else {
                         alert("사용가능한 닉네임입니다.")
@@ -211,6 +236,14 @@ if(isset($_SESSION['useridx'])){
     
     sign_btn.addEventListener('click', ()=>{
         event.preventDefault()
+        let pattern = /[^A-Za-z0-9]/
+
+        if(pattern.test(email_input.value)){
+            if(email_input.value!=''){
+            alert('이메일은 영어, 숫자만 입력가능합니다.')
+            email_input.focus()
+            return false}
+        }
 
         if(user_id.value == ''){
             alert('ID를 입력해주세요.')
@@ -227,21 +260,25 @@ if(isset($_SESSION['useridx'])){
                 let value = password.value;
                 let pattern = /[^A-Za-z0-9!@]/;
                 if(pattern.test(value)){
-                    alert("!, @만 입력 가능합니다.")
+                    alert("비밀번호엔 !, @과 영어, 숫자만 입력 가능합니다.")
+                    password.focus();
                     return false
                 }  
             
             }else {
                 alert("!, @의 특수문자를 최소 1개 입력해주세요.")
+                password.focus();
                 return false
             }
             
         } else {
             alert("8자리 이상 12자리 이하를 입력하세요.")
+            password.focus();
             return false
         }
         if(idok == 0){
             alert('id 중복확인 해주세요.')
+            user_id.focus();
             return false
         }
         if (password.value != passwordck.value){
@@ -252,6 +289,7 @@ if(isset($_SESSION['useridx'])){
 
         if(nameok == 0){
             alert('닉네임 중복확인 해주세요.')
+            uname.focus()
             return false
         }
 
