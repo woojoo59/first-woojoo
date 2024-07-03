@@ -99,20 +99,15 @@ $fr = fread($fp, $fz);
 fclose($fp);
 $array = unserialize($fr);
 
+$as = array_keys($array);
+
 
 echo '<script>';
 echo 'let allowExtensions = [];';
-if(isset($array['jpg'])){echo 'allowExtensions.push("jpg");';}
-if(isset($array['gif'])){echo 'allowExtensions.push("gif");';}
-if(isset($array['hwp'])){echo 'allowExtensions.push("hwp");';}
-if(isset($array['xls'])){echo 'allowExtensions.push("xls");';}
-if(isset($array['pdf'])){echo 'allowExtensions.push("pdf");';}
-if(isset($array['zip'])){echo 'allowExtensions.push("zip");';}
-if(isset($array['png'])){echo 'allowExtensions.push("png");';}
-if(isset($array['txt'])){echo 'allowExtensions.push("txt");';}
-if(isset($array['hwpx'])){echo 'allowExtensions.push("hwpx");';}
-if(isset($array['xlsx'])){echo 'allowExtensions.push("xlsx");';}
-echo '</script>'
+foreach($as as $al){
+    echo 'allowExtensions.push("'.$al.'");';
+}
+echo '</script>';
 ?>
 
 

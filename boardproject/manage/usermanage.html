@@ -164,12 +164,16 @@ $emailback = $email1[1];
             
             <div id="btndiv"><button id="sign_btn" type="submit">회원정보수정</button></div></div>
             <input type="hidden" name="useridx" value="<?php echo $useridx; ?>">
+            <input type="hidden" id="idck" value="<?php echo $usernames; ?>">
+            <input type="hidden" id="nameck" value="<?php echo $uname; ?>">
         </div></form>
     </div>
 </body>
 <script>
-    const idck = "<?php echo $usernames; ?>"
-    const nameck = "<?php echo $uname; ?>"
+    const i = document.querySelector('#idck')
+    const n = document.querySelector('#nameck')
+    const idck = i.value
+    const nameck = n.value
 
     const user_id = document.querySelector('#user_id')
     const password = document.querySelector('#password')
@@ -283,8 +287,8 @@ $emailback = $email1[1];
                 let value = password.value;
                 let pattern = /[^A-Za-z0-9!@]/;
                 if(pattern.test(value)){
-                    alert("!, @만 입력 가능합니다.")
-                    
+                    alert("비밀번호엔 !, @만 입력 가능합니다.")
+                    return false
                 }  
             
             }else {

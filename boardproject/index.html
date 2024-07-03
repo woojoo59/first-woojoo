@@ -205,7 +205,9 @@ th{
         <form method="get" id="date_form">
             <div>
             시작 <input type="text" name="sdate" id="datepicker" class="sdate">
+            <input type="hidden" id="sd" value="<?php echo $sdate; ?>">
             끝   <input type="text" name="ldate" id="datepicker1" class="ldate">
+            <input type="hidden" id="ld" value="<?php echo $ldate; ?>">
         </div>
 
             <select name="select" id="select">
@@ -252,8 +254,10 @@ th{
 ?>
     <script src="search.js"></script>
     <script>
-        const s = "<?php echo $sdate; ?>"
-        const l = "<?php echo $ldate; ?>"
+        const sd = document.querySelector('#sd')
+        const ld = document.querySelector('#ld')
+        const s = sd.value
+        const l = ld.value
         
         
 

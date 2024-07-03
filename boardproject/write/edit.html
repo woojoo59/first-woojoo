@@ -103,6 +103,7 @@ include '../view.php';
 
                 <?php echo $row['content'] ?> 
             </div><input type="hidden" name="write_content" id="write_content">
+            <input type="hidden" id="view" value="<?php echo $view; ?>">
         </form>
         
     </div>
@@ -119,25 +120,21 @@ $fr = fread($fp, $fz);
 
 fclose($fp);
 $array = unserialize($fr);
+$as = array_keys($array);
+
 
 echo '<script>';
 
 echo 'let allowExtensions = [];';
-if(isset($array['jpg'])){echo 'allowExtensions.push("jpg");';}
-if(isset($array['gif'])){echo 'allowExtensions.push("gif");';}
-if(isset($array['hwp'])){echo 'allowExtensions.push("hwp");';}
-if(isset($array['xls'])){echo 'allowExtensions.push("xls");';}
-if(isset($array['pdf'])){echo 'allowExtensions.push("pdf");';}
-if(isset($array['zip'])){echo 'allowExtensions.push("zip");';}
-if(isset($array['png'])){echo 'allowExtensions.push("png");';}
-if(isset($array['txt'])){echo 'allowExtensions.push("txt");';}
-if(isset($array['hwpx'])){echo 'allowExtensions.push("hwpx");';}
-if(isset($array['xlsx'])){echo 'allowExtensions.push("xlsx");';}
-echo 'const view='.$view;
+foreach($as as $al){
+    echo 'allowExtensions.push("'.$al.'");';
+}
 echo '</script>'
 
 ?>
     <script>
+        const v = document.querySelector('#view')
+        const view = v.value
         const write_form = document.querySelector('#write_form')
         const write_subject = document.querySelector('#write_subject')
         const content = document.querySelector('#content')

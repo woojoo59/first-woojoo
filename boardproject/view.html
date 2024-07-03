@@ -225,7 +225,7 @@ session_start();
         <form method="post" id="comments_write_form" action="comments/comments_write.php">
             <div id="lc">
                 <input type="text" name="com" id="comments_input">
-                <input type="hidden" name="idx" value="'.$get.'">
+                <input type="hidden" id="view" name="idx" value="'.$get.'">
             </div>
             <div id="rc" style="width: 40px;"><button id="comments_btn">확인</button></div>
         </form>
@@ -323,7 +323,8 @@ session_start();
         if($row['useridx'] == $_SESSION['useridx']or $_SESSION['username']=='master') {
         echo "
     <script>
-        const view = ".$_GET['view']."
+        const v = document.querySelector('#view')
+        const view = v.value
         const edit_btn = document.querySelector('#edit_btn')
         edit_btn.addEventListener('click', () => {
             self.location.href = 'write/edit.html?view='+view

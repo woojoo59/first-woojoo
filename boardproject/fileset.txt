@@ -1,1 +1,1 @@
-a:9:{s:3:"jpg";s:2:"on";s:3:"gif";s:2:"on";s:3:"hwp";s:2:"on";s:3:"xls";s:2:"on";s:3:"pdf";s:2:"on";s:3:"zip";s:2:"on";s:3:"png";s:2:"on";s:3:"txt";s:2:"on";s:4:"hwpx";s:2:"on";}
+a:10:{s:3:"jpg";s:2:"on";s:3:"gif";s:2:"on";s:3:"hwp";s:2:"on";s:3:"xls";s:2:"on";s:3:"pdf";s:2:"on";s:3:"zip";s:2:"on";s:3:"png";s:2:"on";s:3:"txt";s:2:"on";s:4:"hwpx";s:2:"on";s:4:"xlsx";s:2:"on";}
